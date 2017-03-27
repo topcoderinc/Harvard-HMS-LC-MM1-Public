@@ -1,0 +1,99 @@
+TODO (coding):
+better predictions:
+  * store model after BN to be deterministic
+  * group scans to avoid large memory usage
+
+min_volume, max_volume for vis.cpp
+
+averaging predictions (probably not, due to lack of good model)
+
+Things to check:
+c) bigger resolution (either zooming or larger model)
+d) rotations
+e) different validation set or train on everything
+
+./run.sh --dilarch 1 --batch_size 32 --arch_multiplier 1 --crop 300 --final 300 --aug_size 20 --num_epochs 100 --out_channels 12
+
+./run.sh --dilarch 1 --batch_size 32 --arch_multiplier 1 --crop 300 --final 300 --aug_size 20 --num_epochs 100 --out_channels 2 --optimizer momentum
+
+0. modify cost function so that smaller tumors are penalized more
+1. U-net/front-end + context module (basic?)
+2. more augmentation (small rotations)
+3. play with other annotations and their coefficients
+5. check discrepancy between scores (if there is any)
+6. try parameters, check SGD momentum
+7. regularize parameters
+
+check batchnorm retraining in prediction phase
+
+test:
+DONE 4. add more rounds of predictions and averaging
+
+
+
+
+
+
+
+
+
+
+
+scans.csv
+patient_id,scan_id,x0,y0,dx,dy
+
+
+instructions:
+
+**** Preparing data ****
+
+tar xvzf example_extracted.tgz 
+tar xvzf provisional*.tgz 
+python process.py --path example_extracted
+cp scans.csv scans_all.csv
+mkdir heatmaps
+python prep_heatmaps.py
+mv heatmaps heatmaps200
+cp masks.csv 12-masks.csv
+
+python process.py --path provisional_extracted_no_gt
+mv scans.csv scans_test.csv
+
+
+**************** Best scores ****************
+python -u main.py --dilarch 1 --batch_size 32 --arch_multiplier 1.5 --crop 300 --min_size 300 --max_size 300 --num_epochs 100 --restore_path runs/54/models/epoch34.ckpt --predict 1
+score for threshold 115 is 0.213119
+
+time python -u main.py --dilarch 1 --batch_size 32 --arch_multiplier 1.5 --crop 300 --min_size 0 --max_size 10 --num_epochs 100 --out_channels 12 --restore_path runs/54/models/epoch34.ckpt --predict 1 --out_channels 2 --pred_iter 5 --heatmap_dir heatmaps512 --means runs/54/means.p |& tee o5
+ave loss -0.000903008
+ave score for threshold 98 is 0.222365
+
+python -u main.py --dilarch 1 --batch_size 32 --arch_multiplier 1.5 --crop 300 --final 300 --min_size -10 --max_size 10 --restore_path runs/54/models/epoch34.ckpt --means runs/54/means.p --predict 1 --pred_iter 10 --lr 0.0 
+ale retrain batch norm:
+ave score for threshold 62 is 0.235214
+
+
+python -u main.py --dilarch 1 --batch_size 32 --arch_multiplier 1.5 --crop 300 --final 300 --min_size -10 --max_size 10 --restore_path stored_models/model1/epoch34.ckpt --means stored_models/model1/means.p --predict 1 --pred_iter 10 --lr 0.0
+ave score for threshold 66 is 0.234711
+
+submission 6 (251717.95)
+(ec)
+main.py --dilarch 1 --batch_size 32 --arch_multiplier 1.5 --crop 300 --final 300 --aug_size 0 --restore_path runs/23/models/epoch20.ckpt --means runs/23/means.p --predict 1
+ave score for threshold 69 is 0.256047
+
+submission 7 (266010.81)
+python -u main.py --dilarch 1 --batch_size 32 --arch_multiplier 1.5 --crop 300 --final 300 --aug_size 20 --restore_path stored_models/model2/epoch20.ckpt --means stored_models/model2/means.p --predict 1 --pred_iter 10 |& tee o3
+ave score for threshold 67 is 0.263454
+./vis --predictions test_list.txt 67
+
+submission 10 (268485.62)
+./run.sh --dilarch 1 --batch_size 32 --arch_multiplier 1.5 --crop 300 --final 300 --aug_size 20 --rotate 10 --restore_path stored_models/model2/epoch20.ckpt --means stored_models/model2/means.p --num_epochs 20 --predict 1 --restore_path runs/32/models/epoch14.ckpt --means runs/32/means.p
+./vis --predictions test_list.txt 99 --vis |& tee .tmp2
+ave score for threshold 99 is 0.263038
+
+submission 11 (281810.1)
+ave score for threshold 109 is 0.281856
+./run.sh --dilarch 1 --batch_size 32 --arch_multiplier 1.5 --crop 300 --final 300 --aug_size 20 --rotate 10 --restore_path stored_models/model2/epoch20.ckpt --means stored_models/model2/means.p --num_epochs 20 --predict 1 --restore_path runs/32/models/epoch14.ckpt --means runs/32/means.p --pred_iter 10
+time ./vis --predictions test_list.txt 109 |& tee .tmp
+
+

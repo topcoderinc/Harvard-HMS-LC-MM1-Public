@@ -1,0 +1,16 @@
+net: "/home/thomio/sandbox/SegNet-Tutorial/Models/googlenet/train_val.prototxt"
+test_iter: 1000
+test_interval: 200
+test_initialization: false
+display: 50
+base_lr: 0.001
+lr_policy: "step"
+stepsize: 100000
+gamma: 0.96
+max_iter: 100000
+iter_size: 5
+momentum: 0.9
+weight_decay: 0.0002
+snapshot: 3000
+snapshot_prefix: "/home/thomio/sandbox/SegNet-Tutorial/Models/Training/googlenet"
+solver_mode: GPU

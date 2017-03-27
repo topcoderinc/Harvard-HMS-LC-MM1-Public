@@ -1,0 +1,12 @@
+radiomics_gtv|radiomics_gtv|Radiomics_gtv|radiomics_gtv2|radiomics_gtv_nw|radiomics_gtvr
+lungs|Both Lungs|Combo Lung|COMBO LUNGS|lung|Lung|LUNG RT and LT|lungs|Lungs|LUNGS|Lungs_Total|Lungs_TOTAL|Lung_Total|LUNG TOTAL|total lung|Total lung|Total Lung|TOTAL LUNG|TOTAL LUNG.|total lungs|Total Lungs|TOT LUNG|whole lung|RT and LT Lungs|RT and LT LUNGS
+body|body|Body|BODY
+bronchi|Bronchi
+esophagus|Esophagus
+extraneous|1.7-13 PET nodes|gtv|GTV  ITV w 5mm|nodes
+heart|heart|Heart|HEART
+lung_L|Left_ Lung|left_lung|left lung|Left_lung|Left_Lung|Left_LUNG|Left Lung|LEFT LUNG|leftt_lung|l lung|L_Lung|L lung|L Lung|L LUNG|LLUNG|Lt  Lung|lt_lung|lt lung|Lt_lung|Lt_LUNG|Lt Lung|LT_Lung|LT_LUNG|LT Lung|LT LUNG|Lt Lung.|LTLUNG|Lung_L|Lung, Left|lung lt|LUNG_LT
+lung_R|Lung_R|Lung, Right|lung rt|LUNG_RT|Right  Lung|right_lung|right lung|Right_Lung|Right_LUNG|Right Lung|RIGHT LUNG|r lung|R_Lung|R lung|R Lung|R LUNG|RLUNG|rt_lung|rt lung|Rt_lung|Rt_LUNG|Rt Lung|RT_Lung|RT_LUNG|RT Lung|RT LUNG|Rt Lung.|RTLUNG
+radiomics_ln_sum|radiomics_ln_sum|radiomics_LN_sum|radiomics_LN_SUM|Radiomics_ln_sum|Radiomics_LN_sum|radiomics_ln_sum |radiomics_ln_sumt|radiomics_sum_ln
+radiomics_ln_X|radiomics_2R|radiomics_4L|radiomics_ln|radiomics_ln_10L|radiomics_LN_10L|radiomics_ln10L|radiomics_ln_10R|radiomics_ln_1L|radiomics_ln_1R|radiomics_ln_2-4|radiomics_ln_2L|radiomics_ln_2R|radiomics_ln_3a|radiomics_ln_3A|radiomics_ln_4L|radiomics_ln_4R|radiomics_ln_5|radiomics_LN_5|radiomics_ln5-10|radiomics_ln_5-6|radiomics_ln_6|radiomics_ln_7|radiomics_ln7|radiomics_ln_8|radiomics_ln_RSC
+trachea|trachea|Trachea
