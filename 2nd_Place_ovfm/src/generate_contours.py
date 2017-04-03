@@ -51,14 +51,11 @@ if __name__ == '__main__':
             foreground = input_image > 0.15
 
             # predictions = probabilities > 0.5
-            segmentation_predictions = predictions[0]
+            segmentation_predictions = predictions
 
             bigger_mask = np.zeros((512, 512), np.uint8)
             bigger_mask[r0:r1, c0:c1] = segmentation_predictions
             bigger_mask = bigger_mask * foreground
-
-            bigger_probs = np.zeros((512, 512), np.float)
-            bigger_probs[r0:r1, c0:c1] = predictions[1]
 
             segmentation_predictions = bigger_mask
 
@@ -71,21 +68,16 @@ if __name__ == '__main__':
             if not contours:
                 continue
 
-            region_probabilities = []
             filtered_contours = []
             for contour in contours:
                 ys, xs = contour
                 region = utils.mask_single_contour(bigger_mask, xs, ys, 1)
                 area = np.sum(region)
-                average_prob = np.sum(bigger_probs * region) / area
-                region_probabilities.append((average_prob, area))
-                if average_prob > 0.0 and area > 20:
+                if area > 15:
                     filtered_contours.append(contour)
 
-            print("Region prob:",  region_probabilities)
 
-
-            print("COntours", len(contours), len(filtered_contours))
+            print("Contours", len(contours), len(filtered_contours))
             for contour in filtered_contours:
                 ys, xs = contour
                 mm_coordinates = []

@@ -27,6 +27,7 @@ def process_scan(scan_path, predictions_dir, output_directory):
     with open(os.path.join(output_directory, scan_id, "coordinates.txt"), 'w') as f:
         f.write("{},{},{},{}".format(p1[0], p1[1], p2[0], p2[1]))
 
+
     for slice_image_path in glob.glob(scan_path + '/pngs/*.png'):
         image = utils.read_image(slice_image_path)
         slice_id = os.path.basename(slice_image_path).split(".")[0]

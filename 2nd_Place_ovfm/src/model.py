@@ -18,6 +18,9 @@ class Model(metaclass=ABCMeta):
 
 
 class SegmentorModelLung(Model, metaclass=ABCMeta):
+    def __init__(self):
+        self.classes = utils.LUNG_CLASSES
+
     def _get_weights(self, targets):
         weights = tf.zeros_like(targets, dtype=tf.float32)
         for i, w in enumerate(utils.LUNG_CLASS_WEIGHTS):
@@ -35,6 +38,9 @@ class SegmentorModelLung(Model, metaclass=ABCMeta):
 
 
 class SegmentorModelRadiomics(Model, metaclass=ABCMeta):
+    def __init__(self):
+        self.classes = utils.STRUCTURE_CLASS
+
     def _get_weights(self, targets):
         weights = tf.zeros_like(targets, dtype=tf.float32)
         for i, w in enumerate(utils.CLASS_WEIGHTS):
@@ -52,6 +58,9 @@ class SegmentorModelRadiomics(Model, metaclass=ABCMeta):
 
 
 class MultiLabelClassifier(Model, metaclass=ABCMeta):
+    def __init__(self, classes):
+        self.classes = classes
+
     def error(self, logits, targets):
         nll = tf.nn.sigmoid_cross_entropy_with_logits(
             logits, tf.to_float(targets))
@@ -90,6 +99,9 @@ class ConvolutionalEncoderFirst256(Encoder):
 
 
 class ConvolutionalMultiLabelFirst256(MultiLabelClassifier):
+    def __init__(self):
+        super().__init__()
+
     def forward(self, feature_map, is_training):
 
         h = L.convolution2d(feature_map, 256, [7, 7], [2, 2], activation_fn=tf.nn.relu)
@@ -99,13 +111,14 @@ class ConvolutionalMultiLabelFirst256(MultiLabelClassifier):
         batch_size, height, width, depth = h.get_shape()
 
         h = tf.reshape(h, tf.stack([-1, height * width * depth]))
-        logits = L.fully_connected(h, len(STRUCTURE_CLASS) + 1, activation_fn=None)
+        logits = L.fully_connected(h, len(self.classes) + 1, activation_fn=None)
 
         return logits
 
 
 class ConvolutionalSegmentationFirst256(SegmentorModelRadiomics):
     def __init__(self):
+        super().__init__()
         self.encoder = ConvolutionalEncoderFirst256()
 
     def _decode(self, feature_map, is_training):
@@ -120,7 +133,7 @@ class ConvolutionalSegmentationFirst256(SegmentorModelRadiomics):
 
         h = L.convolution2d_transpose(h, 32, [5, 5], [2, 2], activation_fn=tf.nn.relu)
 
-        h = L.convolution2d(h, len(utils.STRUCTURE_CLASS) + 1, [1, 1], [1, 1], activation_fn=None)
+        h = L.convolution2d(h, len(self.classes) + 1, [1, 1], [1, 1], activation_fn=None)
         return h
 
     def forward(self, images, is_training):
@@ -129,6 +142,9 @@ class ConvolutionalSegmentationFirst256(SegmentorModelRadiomics):
 
 
 class ConvolutionalSegmentationModel(SegmentorModelLung):
+    def __init__(self):
+        super().__init__()
+
     def forward(self, input_tensor, is_training):
         dropout_value = 0.5
         h = L.convolution2d(input_tensor, 16, [5, 5], activation_fn=tf.nn.relu)
@@ -162,12 +178,15 @@ class ConvolutionalSegmentationModel(SegmentorModelLung):
         h = L.convolution2d_transpose(h, 16, [5, 5], [2, 2], activation_fn=tf.nn.relu)
         h = L.dropout(h, keep_prob=dropout_value, is_training=is_training)
 
-        h = L.convolution2d(h, len(utils.LUNG_CLASSES) + 1, [1, 1], [1, 1], activation_fn=None)
+        h = L.convolution2d(h, len(self.classes) + 1, [1, 1], [1, 1], activation_fn=None)
 
         return h
 
 
 class ConvolutionalSegmentationModelRadiomics(SegmentorModelRadiomics):
+    def __init__(self):
+        super().__init__()
+
     def forward(self, input_tensor, is_training):
         dropout_value = 0.5
 
@@ -219,12 +238,15 @@ class ConvolutionalSegmentationModelRadiomics(SegmentorModelRadiomics):
         h = tf.nn.relu(h)
         h = L.dropout(h, keep_prob=dropout_value, is_training=is_training)
 
-        h = L.convolution2d(h, len(utils.STRUCTURE_CLASS) + 1, [1, 1], [1, 1], activation_fn=None)
+        h = L.convolution2d(h, len(self.classes) + 1, [1, 1], [1, 1], activation_fn=None)
 
         return h
 
 
 class ConvolutionalSegmentationModel3D(SegmentorModelRadiomics):
+    def __init__(self):
+        super().__init__()
+
     def forward(self, input_tensor, is_training):
         dropout_value = 0.5
         input_tensor = tf.expand_dims(input_tensor, -1)
@@ -269,12 +291,15 @@ class ConvolutionalSegmentationModel3D(SegmentorModelRadiomics):
         h = L.dropout(h, keep_prob=dropout_value, is_training=is_training)
 
 
-        h = L.convolution2d(h, len(utils.STRUCTURE_CLASS) + 1, [1, 1], [1, 1], activation_fn=None)
+        h = L.convolution2d(h, len(self.classes) + 1, [1, 1], [1, 1], activation_fn=None)
 
         return h
 
 
 class VGGModel(SegmentorModelRadiomics):
+    def __init__(self):
+        super().__init__()
+
     def forward(self, input_tensor, is_training):
         dropout_value = 0.5
 
@@ -300,13 +325,16 @@ class VGGModel(SegmentorModelRadiomics):
         h = tf.nn.relu(h)
         h = L.dropout(h, keep_prob=dropout_value, is_training=is_training)
 
-        h = L.convolution2d(h, len(utils.STRUCTURE_CLASS) + 1, [1, 1], [1, 1], activation_fn=None)
+        h = L.convolution2d(h, len(self.classes) + 1, [1, 1], [1, 1], activation_fn=None)
         print(h)
 
         return h
 
 
 class VGGModel(SegmentorModelRadiomics):
+    def __init__(self):
+        super().__init__()
+
     def forward(self, input_tensor, is_training):
         dropout_value = 0.5
 
@@ -317,7 +345,9 @@ class VGGModel(SegmentorModelRadiomics):
         with slim.arg_scope(vgg.vgg_arg_scope()):
             h, end_points = vgg.vgg_19(input_tensor, is_training=is_training)
 
-        h = tf.pad(end_points['vgg_19/conv4'], [[0, 0], [1, 1], [1, 1], [0, 0]], "CONSTANT")
+        print(list(end_points.keys()))
+
+        h = tf.pad(end_points['vgg_19/pool4'], [[0, 0], [1, 1], [1, 1], [0, 0]], "CONSTANT")
         print(h)
 
         h = L.convolution2d_transpose(h, 128, [5, 5], [2, 2], activation_fn=None)
@@ -336,13 +366,16 @@ class VGGModel(SegmentorModelRadiomics):
         h = tf.nn.relu(h)
         h = L.dropout(h, keep_prob=dropout_value, is_training=is_training)
 
-        h = L.convolution2d(h, len(utils.STRUCTURE_CLASS) + 1, [1, 1], [1, 1], activation_fn=None)
+        h = L.convolution2d(h, len(self.classes) + 1, [1, 1], [1, 1], activation_fn=None)
 
         return h
 
 
 
 class ResnetV2Segmentation(SegmentorModelRadiomics):
+    def __init__(self):
+        super().__init__()
+
     def forward(self, input_tensor, is_training):
         # inputs has shape [batch, 513, 513, 3]
         input_tensor = tf.image.resize_images(input_tensor, [512, 512])
@@ -363,6 +396,6 @@ class ResnetV2Segmentation(SegmentorModelRadiomics):
 
         print(h)
 
-        h = L.convolution2d(h, len(utils.STRUCTURE_CLASS) + 1, [1, 1], [1, 1], activation_fn=None)
+        h = L.convolution2d(h, len(self.classes) + 1, [1, 1], [1, 1], activation_fn=None)
         print(h)
         return h

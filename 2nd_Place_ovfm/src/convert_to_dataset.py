@@ -25,29 +25,18 @@ if __name__ == '__main__':
     parser.add_argument(
         '--output_file', type=str, required=True,
         help='output_file')
-    parser.add_argument(
-        '--contrast_file', type=str, required=True,
-        help='Contrast file path')
     args = parser.parse_args()
-
-    contrast = set()
-    with open(args.contrast_file, 'r') as f:
-        for line in f:
-            scan_id, used_contrast = line.split(",")
-            if int(used_contrast):
-                contrast.add(scan_id)
 
 
     with open(args.output_file, 'w') as wf:
         for scan_path in glob.glob(args.input_dir + '/*'):
             scan = os.path.basename(scan_path)
-            print("Contrast:", scan in contrast)
             structure_to_index = defaultdict(list)
             if os.path.exists(os.path.join(scan_path, 'structures.dat')):
                 with open(os.path.join(scan_path, 'structures.dat'), 'r') as f:
                     structures = [s.strip() for s in f.read().split('|')]
                     for i, st in enumerate(structures):
-                        matching = [mst for mst in STRUCTURE_CLASS if mst in st.lower()]
+                        matching = [mst for (mst, _) in STRUCTURE_CLASS if mst in st.lower()]
                         if matching:
                             structure_to_index[matching[0]].append(i)
 
@@ -87,5 +76,5 @@ if __name__ == '__main__':
                                         pixel_coordinates.extend([round(x), round(y)])
                                     result[structure].append(pixel_coordinates)
                 final_result = {'scan_id': scan, 'slice_id': slice_id,
-                                'structures': result, 'tags': tags, 'contrast': scan in contrast}
+                                'structures': result, 'tags': tags}
                 wf.write("{}\n".format(json.dumps(final_result)))
